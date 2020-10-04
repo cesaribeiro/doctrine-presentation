@@ -1,0 +1,454 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/picpay.css" id="theme">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+                <!-- Slide 1-->
+				<section>
+                    <h1>Doctrine ORM/ODM</h1>
+                    <aside class="notes">
+                        Me introduzir, falar como conheceu o doctrine
+                    </aside>
+                </section>
+                <!-- Slide 2-->
+				<section>
+                    <h2>Eloquent ORM</h2>
+                    <p>O Eloquent é um ORM no estilo ActiveRecord que utiliza um Model que corresponde à uma tabela (Ou à uma Collection (Tô de olho em vocês, galera do Jessengers)) e utiliza o mesmo para buscar, atualizar e inserir registros nessa tabela.</p>
+                </section>
+                <!-- Slide 3-->
+                <section>
+                    <h2>Doctrine ORM/ODM</h2>
+                    <p>O Doctrine é um ORM/ODM no estilo DataMapper que interage com o banco utilizando de objetos PHP e uma classe chamada EntityManager.</p>
+                </section>
+                <!-- Slide 4-->
+                <section>
+                    <h2>Qual a diferença entre<h5><strike style="color: #2b2b2b">o charme e o funk</strike></h5></h2><h2>ActiveRecord e DataMapper?</h2>
+                </section>
+                <!-- Slide 5-->
+                <section>
+                    <h3>ActiveRecord</h3>
+                    <p>Objetos do tipo model no ActiveRecord herdam de uma classe pai todos os métodos necessários para interagir com o banco.</p>
+                    <pre class="php">
+                        <code data-trim data-noescape>
+                            use Illuminate\Database\Eloquent\Model;
+                            ​
+                            class User extends Model
+                            {
+                                protected $table = 'users';
+                            }
+                        </code>
+                    </pre>
+                    <aside class="notes">
+                        O nosso model consiste de uma classe que extende do objeto model e define qual é a tabela que esse modelo irá representar.
+                    </aside>
+                </section>
+                <!-- Slide 6-->
+                <section>
+                    <p>Vamos criar um usuário na tabela users:</p>
+                    <pre class="php"><code data-trim data-line-numbers="1-2|4">
+                            $myUser = new User;
+                            $myUser->username = 'ozzy-osbourne';
+
+                            $myUser->save();
+                    </code></pre>
+                    <p>No modelo <span>ActiveRecord</span> cada objeto da classe model é uma linha na tablela então o objeto <code class="text-green">$myUser</code> é o registro de username <span>ozzy-osbourne</span> na tabela <span>users</span></p>
+                    <aside class="notes">
+                        O código acima é bem simples, nós criamos um objeto do tipo user e chamamos o método save do ORM.
+                        Se você observar, nós não precisamos dizer as propriedades do objeto por que o ORM já consegue inferir isso com base no schema.
+                    </aside>
+                </section>
+                <section>
+                    <div class="pros-and-cons">
+                        <div class="pros">
+                            <h4>Vantagens</h4>
+                            <ul>
+                                <li>Extremamente fácil e rápido de implementar.</li>
+                            </ul>
+                        </div>
+                        <div class="cons">
+                            <h4>Desvantagens</h4>
+                            <ul>
+                                <li>Não possui implementação oficial para MongoDB</li>
+                                <li>Fica mais complicado de fazer testes unitários que não interagem com o banco.</li>
+                                <li>Separation of Concerns</li>
+                                <li>Não possui as propriedades diretamente no model, portanto não há autocomlete da IDE</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h3>DataMapper</h3>
+                    <p>A primeira grande diferença entre o Active Record e o Data Mapper é que no Data Mapper nós separamos completamente o domínio da camada de persistência.</p>
+                    <aside class="notes">
+                    </aside>
+                </section>
+                <section>
+                    <p>Um model do Doctrine será algo assim:</p>
+                    <pre class="php"><code data-trim data-noescape>
+                        use Doctrine\ORM\Mapping as ORM;
+                        
+                        /**
+                        * @ORM\Table(name="user")
+                        * @ORM\Entity
+                        */
+                        class User
+                        {
+                            /** 
+                            * @ORM\Id
+                            * @ORM\Column(type="integer")
+                            * @ORM\GeneratedValue
+                            */
+                            public int $id;
+                        ​
+                            /** 
+                            * @ORM\Column(type="string") 
+                            */
+                            public string $username;
+                        }
+                    </code></pre>
+                </section>
+                <section>
+                    <pre class="php"><code data-trim data-noescape>
+                        class User
+                        {
+                            public int $id;
+                            public string $username;
+                        }
+                    </code></pre>
+                </section>
+                <section>
+                    <pre class="php"><code data-trim data-noescape data-line-numbers="1-2|4-5">
+                        $myUser = new User;
+                        $myUser->username = 'ozzy-osbourne';
+                        
+                        EntityManager::persist($myUser);
+                        EntityManager::flush();
+                    </code></pre>
+                </section>
+                <section>
+                    <div class="pros-and-cons">
+                        <div class="pros">
+                            <h4>Vantagens</h4>
+                            <ul>
+                                <li>Separation of Concerns</li>
+                                <li>Mais fácil de fazer testes unitários</li>
+                                <li>Possui implementação oficial para MongoDB</li>
+                                <li>Autocomplete na IDE</li>
+                            </ul>
+                        </div>
+                        <div class="cons">
+                            <h4>Desvantagens</h4>
+                            <ul>
+                                <li>Não possui suporte oficial para o Laravel</li>
+                                <li>Mais verboso</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h1>O EntityManager</h1>
+                </section>
+                <section>
+                    <p>O <span>EntityManager</span> é um "pacotão" de diversas classes que você vai utilizar para interagir com o banco:</p>
+                    <ul>
+                        <li>UnitOfWork</li>
+                        <li>Repository</li>
+                        <li>MetadataFactory</li>
+                        <li>ProxyFactory</li>
+                        <li>etc...</li>
+                    </ul>
+                </section>
+                <section>
+                    <pre class="php"><code data-trim data-noescape>
+                        // ... imports ...
+                        ​
+                        class UserController extends Controller
+                        {
+                            private EntityManager $em;
+                            private UserRepository $userRepository;
+                            ​
+                            public function __construct(EntityManager $em, UserRepository $userRepository)
+                            {
+                                $this->em = $em;
+                                $this->userRepository = $userRepository;
+                            }
+                    </code></pre>
+                </section>
+                <section>
+                    <section>
+                        <h3>Retornar todos os usuários</h3>
+                        <pre class="php"><code data-trim data-noescape>
+                            public function getAllUsers(): JsonResponse
+                            {
+                                $results = $this->em->getRepository(User::class)
+                                                    ->findAll();
+                                ​
+                                return new JsonResponse($results);
+                            }
+                        </code></pre>
+                        <aside class="notes">
+                            Bem simples, chamamos o EntityManager e pedimos para ele nos trazer o repository responsável pela entidade User.
+                            Se não tivermos um Repository criado, ele cria um básico para a gente e depois nós chamamos o findAll.
+                        </aside>
+                    </section>
+                    <section>
+                        <p>O repository padrão do Doctrine possui:</p>
+                        <ul>
+                            <li>find($id)</li>
+                            <li>findAll()</li>
+                            <li>findBy($criteria, $orderBy, $limit, $offset)</li>
+                            <li>findOneBy($criteria)</li>
+                            <li>métodos mágicos Ex: findOneByUsername</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <pre class="php"><code data-trim data-noescape>
+                            use Doctrine\ORM\EntityRepository;
+                            ​
+                            class UserRepository extends EntityRepository
+                            {
+                                public function findOneByUsername(string $username): User
+                                {
+                                    return $this->findOneBy(['username' => $username]);
+                                }
+                            }
+                        </code></pre>
+                    </section>
+                </section>
+                <section>
+                    <h3>Retornar todos os usuários</h3>
+                        <pre class="php"><code data-trim data-noescape>                            ​
+                            class UserController extends Controller
+                            {
+                                private EntityManager $em;
+                                private UserRepository $userRepository;
+                                ​
+                                public function __construct(EntityManager $em, UserRepository $userRepository)
+                                {
+                                    $this->em = $em;
+                                    $this->userRepository = $userRepository;
+                                }
+                        </code></pre>
+                        <pre class="php"><code data-trim data-noescape>
+                            public function getAllUsers(): JsonResponse
+                            {
+                                $results = $this->userRepository->findAll();
+                                ​
+                                return new JsonResponse($results);
+                            }
+                        </code></pre>
+                </section>
+                <section>
+                    <h3>Retornar um usuário pelo username</h3>
+                    <pre class="php"><code data-trim data-noescape>
+                        public function getUserByUsername(string $username): JsonResponse
+                        {
+                            $user = $this->userRepository->findOneByUsername($username);
+                        ​
+                            return new JsonResponse($user);
+                        }
+                    </code></pre>
+                </section>
+                <section>
+                    <section>
+                        <h3>criar um novo usuário:</h3>
+                        <pre class="php"><code data-trim data-noescape>
+                            public function create(UserRequest $request): Response
+                            {
+                                $newUser = new User;
+                                $newUser->username = $request->input('username');
+
+                                $this->em->persist($newUser);
+                                $this->em->flush();
+                                ​
+                                return new Response(null, 201);
+                            }
+                        </code></pre>
+                    </section>
+                    <section data-markdown>
+                        <textarea data-template>
+                          ## Unit of Work
+                          > Mantém uma lista de objetos afetados por transações de negócios e coordena a gravação de alterações e a resolução de problemas de concorrência.
+                          >
+                          > -- [Martin Fowler](https://martinfowler.com/eaaCatalog/unitOfWork.html)
+                        </textarea>
+                    </section>
+                    <section>
+                        <h2>UnitOfWork</h2>
+                        <img class="r-sretch" src="https://i.imgur.com/OdaN8VK.png">
+                    </section>
+                    <aside class="notes">
+                        Vocês viram no exemplo anterior como criar e persistir uma entidade no banco, vamos utilizar essa oportunidade agora para explicar sobre um carinha chamado UnitOfWork.
+​
+                        Ele é responsável por observar as mudanças nos objetos (Entities) e por escrever essas mudanças na ordem certa no banco.
+                        ​
+                        Quando você chama o método `EntityManager::persist()` oque você está fazendo é dizendo para o EntityManager salvar a entidade no UnitOfWork e acompanhar toda e qualquer mudança feitas no objeto.
+                        Para persistir essas mudanças você precisa dizer para o UnitOfWork pegar todas essas alterações, transformar e queries e rodar no banco e isso só acontece quando você realiza um `EntityManager::flush`.
+                        ​
+                        Vale ressaltar que mesmo após um flush, as entidades ainda permanegem no UnitOfWork, onde ele observa e espera qualquer alteração feita nas mesmas, portanto se você está fazendo alterações ou iserções em massa, você precisa 
+                        limpar o UnitOfWork através do método `EntityManager::clear()`. (Você também pode remover individualmente uma entidade do `EntityManager::detach($entity)`)
+                    </aside>
+                </section>
+                <section>
+                    <section>
+                        <h3>atualizar e deletar um usuário:</h3>
+                        <pre class="php"><code data-trim data-noescape>
+                            public function update(int $id, UserRequest $request): JsonResponse
+                            {
+                                $user = $this->userRepository->findOneById($id)
+                                $user->username = $request->input('username');
+                            ​
+                                $this->em->flush();
+                            ​
+                                return new JsonResponse($user);
+                            }
+                        </code></pre>
+                        <pre class="php"><code data-trim data-noescape>
+                            public function delete(int $id): JsonResponse
+                            {
+                                $user = $this->userRepository->findOneById($id);
+                            ​
+                                $this->em->remove($user);
+                                $this->em->flush();
+                            ​
+                                return new JsonResponse($user);
+                            }
+                        </code></pre>
+                        <aside class="notes">
+                            Tá, mas para atualizar ou deletar minhas entidades eu tenho que fazer um select primeiro? Se você quer do jeito fácil: sim. :/
+                            Essa é uma das desvantagens do modelo DataMapper. Mas nós podemos contornar isso com o DQL
+                        </aside>
+                    </section>
+                    <section>
+                        <h3>DQL - Doctrine Query Language</h3>
+                        <p>DQL é a linguagem de query do Doctrine. Em muitos aspectos ela é idêntica ao SQL mas pense que ao invés de trabalharmos com tabelas e colunas nós vamos trabalhar com classes e propriedades.</p>
+                    </section>
+                    <section>
+                        <pre class="dql"><code data-trim data-noescape>
+                            -- DQL
+                            SELECT u
+                            FROM App\Entities\User u
+                            WHERE u.name = :name;
+                        </code></pre>
+                        <pre class="sql"><code data-trim data-noescape>
+                            -- SQL
+                            SELECT u0_.id AS id_0,
+                                u0_.name AS name_1
+                            FROM user u0_
+                            WHERE u0_.name = ?;
+                        </code></pre>
+                    </section>
+                </section>
+                <section>
+                    <h3>atualizar e deletar um usuário:</h3>
+                    <pre class="php"><code data-trim data-noescape>
+                        public function update(int $id, UserRequest $request): Response
+                        {
+                            $this->em->createQuery('UPDATE App\Entities\User u SET u.username = ?1 WHERE u.id = ?2')
+                                    ->setParameter(1, $request->input('username')))
+                                    ->setParameter(2, $id)
+                                    ->execute();
+                        ​
+                            return new Response(null, 200);
+                        }
+                    </code></pre>
+                    <pre class="php"><code data-trim data-noescape>
+                        public function delete(int $id): Response
+                        {
+                            $this->em->createQueryBuilder()
+                                    ->delete(User::class, 'u')
+                                    ->where('u.id = :user_id')
+                                    ->setParameter('user_id', 1)
+                                    ->getQuery()
+                                    ->execute();
+                        ​
+                            return new Response(null, 200);
+                        }
+                    </code></pre>
+                    <aside class="notes">
+                        Tá, mas para atualizar ou deletar minhas entidades eu tenho que fazer um select primeiro? Se você quer do jeito fácil: sim. :/
+                        Essa é uma das desvantagens do modelo DataMapper. Mas nós podemos contornar isso com o DQL
+                    </aside>
+                </section>
+                <section>
+                    <section>
+                        <h1>Tá, curti... Como faço pra usar?</h1>
+                    </section>
+                    <section>
+                        <h3>Para ORM (Bancos Relacionais)</h3>
+                        <img src="https://i.imgur.com/vuIxEAw.png">
+                    </section>
+                    <section>
+                        <h3>Para o ODM (MongoDB)</h3>
+                        <img class="" src="https://i.imgur.com/u71thmx.png">
+                    </section>
+                </section>
+                <section>
+                    <h1>Links</h1>
+                    <ul>
+                        <li>https://culttt.com/2014/06/18/whats-difference-active-record-data-mapper/</li>
+                        <li>https://en.wikipedia.org/wiki/Active_record_pattern</li>
+                        <li>https://laravel.com/docs/8.x/eloquent</li>
+                        <li>https://github.com/adrianmiu/forked-php-orm-benchmark</li>
+                        <li>https://martinfowler.com/eaaCatalog/unitOfWork.html</li>
+                        <li>https://www.doctrine-project.org/projects/doctrine-orm/en/2.7/</li>
+                        <li>https://www.doctrine-project.org/projects/doctrine-orm/en/2.7/tutorials/embeddables.html#dql</li>
+                    </ul>
+                </section>
+                <section>
+                    <section><h1>Perguntas?</h1></section>
+                    <section>
+                        <h1>Muito obrigado!</h1>
+                        <img src="https://i.pinimg.com/originals/c5/5f/8b/c55f8b4545e4faab99b698ec19d4fd16.gif" alt="">
+                    </section>
+                </section>
+			</div>
+        </div>s
+        <style>
+            .pros-and-cons {
+                display: flex;
+            }
+            .pros,.cons {
+                flex: 1;
+            }
+            .pros h4 {
+                color: #2ecc71;
+            }
+            .cons h4 {
+                color: #e74c3c;
+            }
+            .pros li, .cons li {
+                font-size: 25px;
+            }
+        </style>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+			});
+		</script>
+	</body>
+</html>
