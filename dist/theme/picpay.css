@@ -299,3 +299,13 @@ section.has-dark-background, section.has-dark-background h1, section.has-dark-ba
 span {
   color: #11c76f;
   font-style: italic; }
+
+.reveal .slide-background {
+  background-image: url("https://i.imgur.com/1KLw3HP.png");
+  background-position-x: -75px;
+  background-position-y: -75px;
+  background-repeat: no-repeat; }
+
+.reveal pre code {
+  padding: 15px;
+  border-radius: 25px; }
